@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="product-detail">
+    <div class="detail-img-container">
+        <img src="{{ product.image_url if product.image_url else 'https://via.placeholder.com/600x800?text=' + product.name }}"
+            alt="{{ product.name }}" class="detail-img" style="width: 100%;">
+    </div>
+    <div class="detail-info">
+        <h2>{{ product.name }}</h2>
+        <p class="price" style="font-size: 2rem; margin: 20px 0;">${{ "%.2f" | format(product.price) }}</p>
+        <p class="description" style="line-height: 1.6; color: #555;">{{ product.description }}</p>
+        <a href="#" class="btn" style="padding: 15px 40px; font-size: 1.1rem;">Add to Cart</a>
+    </div>
+</div>
+
+<hr style="margin: 50px 0; border: none; border-top: 1px solid #eee;">
+
+<div class="reviews-section">
+    <h3 style="font-family: var(--font-heading); font-size: 2rem;">Customer Reviews</h3>
+
+    <div class="review-form" style="background: #fff; padding: 30px; border-radius: 10px; margin-bottom: 40px;">
+        <h4 style="margin-bottom: 20px;">Leave a Review</h4>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.rating.label }}
+                {{ form.rating(class="form-control", placeholder="1-5") }}
+            </div>
+            <div class="form-group">
+                {{ form.comment.label }}
+                {{ form.comment(class="form-control", rows="4") }}
+            </div>
+            {{ form.submit(class="btn") }}
+        </form>
+    </div>
+
+    {% for review in product.reviews %}
+    <div class="review-card">
+        <div style="display: flex; justify-content: space-between;">
+            <strong style="color: var(--secondary-color);">{{ review.author.username }}</strong>
+            <span>{{ review.rating }}/5 stars</span>
+        </div>
+        <p style="margin-top: 10px;">{{ review.comment }}</p>
+        <small style="color: #888;">Posted on {{ review.date_posted.strftime('%Y-%m-%d') }}</small>
+    </div>
+    {% else %}
+    <p>No reviews yet. Be the first to review this product!</p>
+    {% endfor %}
+</div>
+{% endblock %}

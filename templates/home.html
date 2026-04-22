@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-bg" style="background-image: url('{{ url_for('static', filename='images/hero_banner.png') }}');"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <p class="hero-subtitle">Spring / Summer 2026</p>
+        <h1 class="hero-title">New Collection</h1>
+        <a href="{{ url_for('category', category_name='Clothes') }}" class="btn-hero">Shop Now</a>
+    </div>
+</section>
+
+<!-- Feature Blocks -->
+<section class="feature-blocks">
+    <a href="#" class="feature-block">
+        <img src="{{ url_for('static', filename='images/our_story.png') }}" alt="Our Story" class="feature-block-img">
+        <div class="feature-block-overlay">
+            <h2 class="feature-block-title">Our Story</h2>
+            <span class="feature-block-link">Read More</span>
+        </div>
+    </a>
+    <a href="#" class="feature-block">
+        <img src="{{ url_for('static', filename='images/our_blog.png') }}" alt="Our Blog" class="feature-block-img">
+        <div class="feature-block-overlay">
+            <h2 class="feature-block-title">Our Blog</h2>
+            <span class="feature-block-link">Read More</span>
+        </div>
+    </a>
+</section>
+
+<!-- Featured Products -->
+<div class="section-heading">
+    <h2>Featured Products</h2>
+    <p>Handpicked styles curated just for you</p>
+</div>
+
+<section class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-img-wrapper">
+            {% if loop.index <= 2 %}
+            <span class="product-badge">Best Seller</span>
+            {% endif %}
+            <img src="{{ product.image_url if product.image_url else 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=500&fit=crop' }}"
+                 alt="{{ product.name }}" class="product-img">
+            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="quick-view-btn">Quick View</a>
+        </div>
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="price">${{ "%.2f" | format(product.price) }}</p>
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+        <p style="color: var(--text-light); font-size: 0.9rem;">No products available yet. Check back soon!</p>
+    </div>
+    {% endfor %}
+</section>
+
+{% if products %}
+<div class="shop-all-wrapper">
+    <a href="{{ url_for('category', category_name='Clothes') }}" class="btn-shop-all">Shop All</a>
+</div>
+{% endif %}
+
+<!-- Service Info Bar -->
+<section class="service-bar">
+    <div class="container">
+        <div class="service-item">
+            <div class="service-icon">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <h4>Free Shipping &amp; Returns</h4>
+            <p>On all orders over $50</p>
+        </div>
+        <div class="service-item">
+            <div class="service-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h4>Secured Payments</h4>
+            <p>100% secure checkout</p>
+        </div>
+        <div class="service-item">
+            <div class="service-icon">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h4>Customer Service</h4>
+            <p>24/7 dedicated support</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
