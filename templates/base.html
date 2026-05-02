@@ -18,19 +18,32 @@
 
                 <ul class="nav-links" id="navLinks">
                     <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
-                    <li><a href="{{ url_for('category', category_name='Clothes') }}">Shop</a></li>
-                    <li><a href="{{ url_for('category', category_name='Makeup') }}">Beauty</a></li>
                     {% if current_user.is_authenticated %}
+                        {% if current_user.is_seller %}
+                        <li><a href="{{ url_for('seller_dashboard') }}" class="{% if request.endpoint in ['seller_dashboard', 'seller_new_product', 'seller_edit_product'] %}active{% endif %}">Seller Products</a></li>
+                        <li><a href="{{ url_for('seller_orders') }}" class="{% if request.endpoint in ['seller_orders', 'seller_update_order_status'] %}active{% endif %}">Seller Orders</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('category', category_name='clothes') }}">Shop</a></li>
+                        <li><a href="{{ url_for('category', category_name='makeup') }}">Beauty</a></li>
+                        {% endif %}
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     {% else %}
+                        <li><a href="{{ url_for('category', category_name='clothes') }}">Shop</a></li>
+                        <li><a href="{{ url_for('category', category_name='makeup') }}">Beauty</a></li>
                         <li><a href="{{ url_for('login') }}">Login</a></li>
-                        <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
                     {% endif %}
                 </ul>
 
                 <div class="nav-icons">
-                    <a href="#" aria-label="Search"><i class="fas fa-search"></i></a>
-                    <a href="#" aria-label="Cart"><i class="fas fa-shopping-bag"></i></a>
+                    <form class="nav-search" action="{{ url_for('search') }}" method="get" role="search">
+                        <label for="nav-search-q" class="visually-hidden">Search products</label>
+                        <input type="search" id="nav-search-q" name="q" placeholder="Search" value="{{ request.args.get('q', '') }}" autocomplete="off" maxlength="200">
+                        <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+                    </form>
+                    <a href="{{ url_for('view_cart') }}" class="nav-cart-link" aria-label="Shopping cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+                    </a>
                 </div>
 
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
@@ -79,8 +92,8 @@
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="{{ url_for('home') }}">Home</a></li>
-                        <li><a href="{{ url_for('category', category_name='Clothes') }}">Shop</a></li>
-                        <li><a href="{{ url_for('category', category_name='Makeup') }}">Beauty</a></li>
+                        <li><a href="{{ url_for('category', category_name='clothes') }}">Shop</a></li>
+                        <li><a href="{{ url_for('category', category_name='makeup') }}">Beauty</a></li>
                         <li><a href="#">About</a></li>
                     </ul>
                 </div>

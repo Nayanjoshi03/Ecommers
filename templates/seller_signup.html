@@ -2,32 +2,29 @@
 {% block content %}
 <div class="form-page">
     <div class="form-container">
-        <h2>Join Muskan</h2>
+        <h2>Seller Sign Up</h2>
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div class="form-group">
                 {{ form.username.label }}
-                {{ form.username(class="form-control", placeholder="Choose a username") }}
+                {{ form.username(class="form-control", placeholder="Choose username") }}
             </div>
             <div class="form-group">
                 {{ form.email.label }}
-                {{ form.email(class="form-control", placeholder="Enter your email") }}
+                {{ form.email(class="form-control", placeholder="Enter email") }}
             </div>
             <div class="form-group">
                 {{ form.password.label }}
-                {{ form.password(class="form-control", placeholder="Create a password") }}
+                {{ form.password(class="form-control", placeholder="Create password") }}
             </div>
             <div class="form-group">
                 {{ form.confirm_password.label }}
-                {{ form.confirm_password(class="form-control", placeholder="Confirm your password") }}
+                {{ form.confirm_password(class="form-control", placeholder="Confirm password") }}
             </div>
             {{ form.submit(class="btn btn-full") }}
         </form>
         <p class="form-footer-text">
-            Already have an account? <a href="{{ url_for('login') }}">Login</a>
-        </p>
-        <p class="form-footer-text">
-            Want to sell? <a href="{{ url_for('seller_signup') }}">Seller Sign Up</a>
+            Already registered? <a href="{{ url_for('seller_login') }}">Seller login</a>
         </p>
     </div>
 </div>

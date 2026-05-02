@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="cart-section page-content">
+    <div class="container">
+        <h1 class="cart-page-title">Shopping cart</h1>
+
+        {% if cart_lines %}
+        <div class="cart-layout">
+            <div class="cart-items">
+                {% for line in cart_lines %}
+                <article class="cart-row">
+                    <a href="{{ url_for('product_detail', product_id=line.product.id) }}" class="cart-row-img">
+                        <img src="{{ line.product.primary_image_url if line.product.primary_image_url else 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=250&fit=crop' }}"
+                             alt="{{ line.product.name }}">
+                    </a>
+                    <div class="cart-row-body">
+                        <h2><a href="{{ url_for('product_detail', product_id=line.product.id) }}">{{ line.product.name }}</a></h2>
+                        <p class="cart-row-price">₹{{ "%.2f"|format(line.product.price) }} each</p>
+                        <p class="cart-row-sub">Line total: <strong>₹{{ "%.2f"|format(line.line_total) }}</strong></p>
+                        <div class="cart-row-actions">
+                            <form method="post" action="{{ url_for('cart_update', product_id=line.product.id) }}" class="cart-update-form">
+                                {{ update_forms[line.product.id].hidden_tag() }}
+                                <label class="cart-qty-label" for="qty-{{ line.product.id }}">Qty</label>
+                                {{ update_forms[line.product.id].quantity(
+                                    class="form-control cart-qty-input",
+                                    id="qty-{{ line.product.id }}",
+                                    min=1,
+                                    max=line.max_qty
+                                ) }}
+                                {{ update_forms[line.product.id].submit(class="btn btn-outline btn-small") }}
+                            </form>
+                            <form method="post" action="{{ url_for('cart_remove', product_id=line.product.id) }}" class="cart-remove-form">
+                                {{ remove_forms[line.product.id].hidden_tag() }}
+                                {{ remove_forms[line.product.id].submit(class="btn btn-text-danger btn-small") }}
+                            </form>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+
+            <aside class="cart-summary card-panel">
+                <h2>Order summary</h2>
+                <p class="cart-summary-total">Total <span>₹{{ "%.2f"|format(cart_total) }}</span></p>
+                <a href="{{ url_for('checkout_cart') }}" class="btn checkout-submit cart-checkout-btn">Checkout</a>
+                <a href="{{ url_for('home') }}" class="cart-continue-link">Continue shopping</a>
+            </aside>
+        </div>
+        {% else %}
+        <p class="cart-empty">Your cart is empty.</p>
+        <a href="{{ url_for('home') }}" class="btn">Browse products</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,19 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 style="font-family: var(--font-heading); margin: 2.2em 1.2em 0.3em;">{{ title }} Collection</h1>
-<div class="product-grid">
-    {% for product in products %}
-    <div class="product-card">
-        <img src="{{ product.image_url if product.image_url else 'https://via.placeholder.com/400x500?text=' + product.name }}"
-            alt="{{ product.name }}" class="product-img">
-        <div class="product-info">
-            <h3>{{ product.name }}</h3>
-            <p class="price">${{ "%.2f" | format(product.price) }}</p>
-            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn">View Details</a>
+<div class="category-page-wrap container">
+    <h1 class="category-page-title">{{ category.name|title }}{% if category.parent %} <span class="category-parent-label">in {{ category.parent.name|title }}</span>{% endif %}</h1>
+
+    {% if subcategories %}
+    <nav class="subcategory-nav" aria-label="Subcategories">
+        {% for sub in subcategories %}
+        <a href="{{ url_for('category', category_name=sub.name) }}" class="subcategory-pill">{{ sub.name|title }}</a>
+        {% endfor %}
+    </nav>
+    {% endif %}
+
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <img src="{{ product.primary_image_url if product.primary_image_url else 'https://via.placeholder.com/400x500?text=' + product.name }}"
+                alt="{{ product.name }}" class="product-img">
+            <div class="product-info">
+                {% if product.category %}
+                <p class="product-category-tag">{{ product.category.name|title }}</p>
+                {% endif %}
+                <h3>{{ product.name }}</h3>
+                <p class="price">₹{{ "%.2f" | format(product.price) }}</p>
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn">View Details</a>
+            </div>
         </div>
+        {% else %}
+        <p class="category-empty">No products found in this category.</p>
+        {% endfor %}
     </div>
-    {% else %}
-    <p>No products found in this category.</p>
-    {% endfor %}
 </div>
 {% endblock %}

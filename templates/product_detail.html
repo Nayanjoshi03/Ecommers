@@ -1,50 +1,138 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="product-detail">
-    <div class="detail-img-container">
-        <img src="{{ product.image_url if product.image_url else 'https://via.placeholder.com/600x800?text=' + product.name }}"
-            alt="{{ product.name }}" class="detail-img" style="width: 100%;">
-    </div>
-    <div class="detail-info">
-        <h2>{{ product.name }}</h2>
-        <p class="price" style="font-size: 2rem; margin: 20px 0;">${{ "%.2f" | format(product.price) }}</p>
-        <p class="description" style="line-height: 1.6; color: #555;">{{ product.description }}</p>
-        <a href="#" class="btn" style="padding: 15px 40px; font-size: 1.1rem;">Add to Cart</a>
-    </div>
-</div>
-
-<hr style="margin: 50px 0; border: none; border-top: 1px solid #eee;">
-
-<div class="reviews-section">
-    <h3 style="font-family: var(--font-heading); font-size: 2rem;">Customer Reviews</h3>
-
-    <div class="review-form" style="background: #fff; padding: 30px; border-radius: 10px; margin-bottom: 40px;">
-        <h4 style="margin-bottom: 20px;">Leave a Review</h4>
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.rating.label }}
-                {{ form.rating(class="form-control", placeholder="1-5") }}
+{% set slides = product.gallery_urls %}
+{% set fallback_img = 'https://via.placeholder.com/600x800?text=' + (product.name | urlencode) %}
+<section class="product-page">
+    <div class="container">
+        <div class="product-detail">
+            <div class="detail-img-container">
+                {% if slides|length > 1 %}
+                <div class="product-slider" id="productSlider" data-count="{{ slides|length }}">
+                    <div class="slider-viewport">
+                        <div class="slider-track" id="sliderTrack">
+                            {% for url in slides %}
+                            <div class="slider-slide">
+                                <img src="{{ url }}" alt="{{ product.name }} — {{ loop.index }}" class="detail-img slider-img">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="button" class="slider-btn slider-prev" id="sliderPrev" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>
+                    <button type="button" class="slider-btn slider-next" id="sliderNext" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>
+                    <div class="slider-dots" id="sliderDots" role="tablist">
+                        {% for url in slides %}
+                        <button type="button" class="slider-dot{% if loop.first %} active{% endif %}" data-index="{{ loop.index0 }}" aria-label="Image {{ loop.index }}" role="tab"></button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <img src="{{ slides[0] if slides else fallback_img }}"
+                    alt="{{ product.name }}" class="detail-img">
+                {% endif %}
             </div>
-            <div class="form-group">
-                {{ form.comment.label }}
-                {{ form.comment(class="form-control", rows="4") }}
+            <div class="detail-info">
+                <p class="detail-category">{% if product.category.parent %}{{ product.category.parent.name|title }} · {% endif %}{{ product.category.name|title }}</p>
+                <h2>{{ product.name }}</h2>
+                <p class="detail-price">₹{{ "%.2f" | format(product.price) }}</p>
+                <p class="description">{{ product.description }}</p>
+                <div class="detail-meta">
+                    <span>In stock: {{ product.stock_count }}</span>
+                    <span>{{ product.reviews|length }} review(s)</span>
+                </div>
+                <div class="detail-actions">
+                    {% if product.stock_count > 0 %}
+                    <a href="{{ url_for('checkout', product_id=product.id) }}" class="btn detail-buy-btn">Buy now</a>
+                    <form method="post" action="{{ url_for('cart_add', product_id=product.id) }}" class="detail-add-cart-form">
+                        {{ add_cart_form.hidden_tag() }}
+                        <div class="detail-qty-row">
+                            <label for="add-cart-qty" class="detail-qty-label">Qty</label>
+                            {{ add_cart_form.quantity(
+                                class="form-control detail-qty-input",
+                                id="add-cart-qty",
+                                min=1,
+                                max=product.stock_count
+                            ) }}
+                        </div>
+                        {{ add_cart_form.submit(class="btn btn-outline detail-cart-btn") }}
+                    </form>
+                    {% else %}
+                    <span class="btn detail-buy-btn btn-disabled" aria-disabled="true">Out of stock</span>
+                    <span class="btn btn-outline detail-cart-btn btn-disabled" aria-disabled="true">Add to Cart</span>
+                    {% endif %}
+                </div>
             </div>
-            {{ form.submit(class="btn") }}
-        </form>
-    </div>
-
-    {% for review in product.reviews %}
-    <div class="review-card">
-        <div style="display: flex; justify-content: space-between;">
-            <strong style="color: var(--secondary-color);">{{ review.author.username }}</strong>
-            <span>{{ review.rating }}/5 stars</span>
         </div>
-        <p style="margin-top: 10px;">{{ review.comment }}</p>
-        <small style="color: #888;">Posted on {{ review.date_posted.strftime('%Y-%m-%d') }}</small>
     </div>
-    {% else %}
-    <p>No reviews yet. Be the first to review this product!</p>
-    {% endfor %}
-</div>
+</section>
+
+<section class="reviews-section">
+    <div class="container">
+        <div class="reviews-header">
+            <h3>Customer Reviews</h3>
+            <p>See what shoppers are saying about this product.</p>
+        </div>
+
+        <div class="review-form">
+            <h4>Leave a Review</h4>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.rating.label }}
+                    {{ form.rating(class="form-control", placeholder="1-5") }}
+                </div>
+                <div class="form-group">
+                    {{ form.comment.label }}
+                    {{ form.comment(class="form-control", rows="4") }}
+                </div>
+                {{ form.submit(class="btn") }}
+            </form>
+        </div>
+
+        {% for review in product.reviews %}
+        <div class="review-card">
+            <div class="review-head">
+                <strong>{{ review.author.username }}</strong>
+                <span>{{ review.rating }}/5 stars</span>
+            </div>
+            <p>{{ review.comment }}</p>
+            <small>Posted on {{ review.date_posted.strftime('%Y-%m-%d') }}</small>
+        </div>
+        {% else %}
+        <div class="review-card">
+            <p>No reviews yet. Be the first to review this product!</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% if slides|length > 1 %}
+<script>
+(function() {
+    var track = document.getElementById('sliderTrack');
+    var prev = document.getElementById('sliderPrev');
+    var next = document.getElementById('sliderNext');
+    var dotsWrap = document.getElementById('sliderDots');
+    if (!track || !prev || !next) return;
+    var count = parseInt(document.getElementById('productSlider').getAttribute('data-count'), 10) || 1;
+    var i = 0;
+    function go(index) {
+        i = (index + count) % count;
+        track.style.transform = 'translateX(-' + (i * 100) + '%)';
+        if (dotsWrap) {
+            var dots = dotsWrap.querySelectorAll('.slider-dot');
+            dots.forEach(function(d, j) { d.classList.toggle('active', j === i); });
+        }
+    }
+    prev.addEventListener('click', function() { go(i - 1); });
+    next.addEventListener('click', function() { go(i + 1); });
+    if (dotsWrap) {
+        dotsWrap.querySelectorAll('.slider-dot').forEach(function(dot) {
+            dot.addEventListener('click', function() {
+                go(parseInt(dot.getAttribute('data-index'), 10));
+            });
+        });
+    }
+})();
+</script>
+{% endif %}
 {% endblock %}

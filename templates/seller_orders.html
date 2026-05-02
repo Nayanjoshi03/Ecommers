@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="seller-section">
+    <div class="container">
+        <div class="seller-header">
+            <h1>Seller Orders</h1>
+        </div>
+
+        <div class="seller-table-wrapper">
+            <table class="seller-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User ID</th>
+                        <th>Total</th>
+                        <th>Created</th>
+                        <th>Items</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user_id if order.user_id else 'Guest' }}</td>
+                        <td>₹{{ "%.2f"|format(seller_totals[order.id]) }}</td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <ul class="seller-items-list">
+                                {% for item in seller_items_by_order[order.id] %}
+                                <li>{{ item.product.name if item.product else 'Unknown product' }} x {{ item.quantity }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('seller_update_order_status', order_id=order.id) }}" class="seller-status-form">
+                                {{ forms[order.id].hidden_tag() }}
+                                {{ forms[order.id].status(class="form-control") }}
+                                {{ forms[order.id].submit(class="btn btn-small") }}
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">No orders available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

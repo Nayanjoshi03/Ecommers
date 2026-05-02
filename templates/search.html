@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-content search-page">
+    <div class="container">
+        <div class="section-heading search-heading">
+            <h1>Search</h1>
+            {% if query %}
+            <p>Results for "{{ query }}" — {{ products|length }} found</p>
+            {% else %}
+            <p>Enter a search term in the header to find products.</p>
+            {% endif %}
+        </div>
+
+        <section class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="product-img-wrapper">
+                    <img src="{{ product.primary_image_url if product.primary_image_url else 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=500&fit=crop' }}"
+                         alt="{{ product.name }}" class="product-img">
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}" class="quick-view-btn">Quick View</a>
+                </div>
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <p class="price">₹{{ "%.2f" | format(product.price) }}</p>
+                </div>
+            </div>
+            {% else %}
+            {% if query %}
+            <p class="search-empty">No products match your search. Try different keywords.</p>
+            {% endif %}
+            {% endfor %}
+        </section>
+    </div>
+</div>
+{% endblock %}

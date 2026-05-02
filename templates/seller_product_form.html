@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="seller-section">
+    <div class="container">
+        <div class="form-container seller-form-container">
+            <h2>{% if is_edit %}Edit Product{% else %}Add Product{% endif %}</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.name.label }}
+                    {{ form.name(class="form-control", placeholder="Product name") }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label }}
+                    {{ form.description(class="form-control", rows="4", placeholder="Product description") }}
+                </div>
+                <div class="form-group">
+                    {{ form.price.label }}
+                    {{ form.price(class="form-control", placeholder="0.00") }}
+                </div>
+                <div class="form-group">
+                    {{ form.stock_count.label }}
+                    {{ form.stock_count(class="form-control", placeholder="0") }}
+                </div>
+                <div class="form-group">
+                    {{ form.category_id.label }}
+                    {{ form.category_id(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label for="product_images">Product Images</label>
+                    <input id="product_images" name="product_images" type="file" class="form-control" multiple accept="image/*">
+                    <small class="seller-help-text">You can select multiple images at once.</small>
+                </div>
+                {% if is_edit and product.images %}
+                <div class="form-group">
+                    <label>Current Images</label>
+                    <div class="seller-image-list">
+                        {% for image in product.images %}
+                        <img src="{{ image.image_path }}" alt="{{ product.name }}" class="seller-thumb">
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="seller-form-actions">
+                    {{ form.submit(class="btn") }}
+                    <a class="btn btn-secondary" href="{{ url_for('seller_dashboard') }}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

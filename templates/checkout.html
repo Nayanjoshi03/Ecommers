@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="checkout-section page-content">
+    <div class="container">
+        <div class="checkout-layout">
+            <div class="checkout-summary">
+                <h1>Checkout</h1>
+                <div class="checkout-product-card">
+                    <img src="{{ product.primary_image_url if product.primary_image_url else 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=250&fit=crop' }}" alt="">
+                    <div>
+                        <h2>{{ product.name }}</h2>
+                        <p class="checkout-price">₹{{ "%.2f"|format(product.price) }} each</p>
+                        <p class="checkout-stock">In stock: {{ product.stock_count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-forms card-panel">
+                <h2>Delivery</h2>
+                <form method="POST" action="" class="checkout-form" id="checkoutForm">
+                    {{ form.hidden_tag() }}
+
+                    {% if not current_user.is_authenticated %}
+                    <div class="form-group">
+                        {{ form.guest_email.label(class="form-label") }}
+                        {{ form.guest_email(class="form-control", placeholder="you@example.com") }}
+                        {% if form.guest_email.errors %}
+                            {% for err in form.guest_email.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        {{ form.quantity.label(class="form-label") }}
+                        {{ form.quantity(class="form-control", min=1, max=product.stock_count) }}
+                        {% if form.quantity.errors %}
+                            {% for err in form.quantity.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.delivery_full_name.label(class="form-label") }}
+                        {{ form.delivery_full_name(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.delivery_phone.label(class="form-label") }}
+                        {{ form.delivery_phone(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.delivery_address.label(class="form-label") }}
+                        {{ form.delivery_address(class="form-control", rows="3") }}
+                    </div>
+                    <div class="form-row-checkout">
+                        <div class="form-group">
+                            {{ form.delivery_city.label(class="form-label") }}
+                            {{ form.delivery_city(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.delivery_postal.label(class="form-label") }}
+                            {{ form.delivery_postal(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.delivery_country.label(class="form-label") }}
+                        {{ form.delivery_country(class="form-control") }}
+                    </div>
+
+                    <h2 class="checkout-subheading">Payment</h2>
+                    <div class="form-group">
+                        {{ form.payment_method.label(class="form-label") }}
+                        {{ form.payment_method(class="form-control", id="paymentMethod") }}
+                    </div>
+                    <div id="cardFields" class="card-fields">
+                        <div class="form-group">
+                            {{ form.payment_card_holder.label(class="form-label") }}
+                            {{ form.payment_card_holder(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.payment_card_last4.label(class="form-label") }}
+                            {{ form.payment_card_last4(class="form-control", maxlength="4", inputmode="numeric", placeholder="1234") }}
+                            <small class="form-hint">Demo only — never enter a full card number.</small>
+                        </div>
+                    </div>
+
+                    {{ form.submit(class="btn checkout-submit") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+(function() {
+    var sel = document.getElementById('paymentMethod');
+    var cardBlock = document.getElementById('cardFields');
+    if (!sel || !cardBlock) return;
+    function toggle() {
+        cardBlock.style.display = sel.value === 'card' ? 'block' : 'none';
+    }
+    sel.addEventListener('change', toggle);
+    toggle();
+})();
+</script>
+{% endblock %}
